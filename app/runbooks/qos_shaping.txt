@@ -1,0 +1,34 @@
+QoS Traffic Shaping Runbook
+
+Overview:
+Quality of Service (QoS) traffic shaping manages bandwidth allocation across
+different traffic classes to prioritize latency-sensitive flows.
+
+QoS Shaping Strategy:
+The qos_shaping approach throttles bulk or background traffic to free up bandwidth
+for priority applications. This is effective when mixed traffic types compete for
+limited capacity.
+
+Best used when:
+- Traffic analysis shows bulk/background flows consuming capacity
+- Need to protect latency-sensitive applications
+- Medium risk tolerance acceptable
+
+Implementation steps:
+1. Classify traffic into priority classes
+2. Define shaping rates per class
+3. Apply policies to congested interfaces
+4. Monitor queue depths and drops
+5. Fine-tune throttle percentages
+
+Typical configurations:
+- Throttle bulk traffic by 15-25%
+- Prioritize real-time and interactive flows
+- Set minimum bandwidth guarantees
+
+Expected outcomes:
+- Latency reduction: 20-40%
+- Loss reduction for priority traffic: 40-60%
+- Time to effect: 5-8 minutes
+- May increase latency for throttled traffic classes
+

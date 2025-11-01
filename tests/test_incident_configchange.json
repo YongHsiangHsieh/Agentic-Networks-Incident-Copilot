@@ -1,0 +1,32 @@
+{
+  "incident_id": "INC-20250101-002",
+  "window": {
+    "start_ts": "2025-01-01T14:00:00Z",
+    "end_ts": "2025-01-01T14:20:00Z"
+  },
+  "hot_path": "RouterA->RouterB->RouterC",
+  "metrics": {
+    "latency_ms": [32.0, 33.0, 35.0, 58.0, 62.0, 65.0, 68.0, 70.0, 71.0, 72.0],
+    "loss_pct": [0.1, 0.1, 0.2, 1.5, 1.8, 2.0, 2.1, 2.2, 2.3, 2.4],
+    "util_pct": {
+      "RouterA-RouterB": [68.0, 70.0, 72.0, 88.0, 90.0, 92.0, 93.0, 93.0, 94.0, 94.0],
+      "RouterB-RouterC": [65.0, 67.0, 70.0, 85.0, 88.0, 90.0, 91.0, 92.0, 92.0, 93.0]
+    }
+  },
+  "changes": [
+    {
+      "ts": "2025-01-01T14:08:00Z",
+      "type": "config_change",
+      "scope": "RouterB"
+    }
+  ],
+  "policy": {
+    "latency_target_ms": 50,
+    "min_path_redundancy": 2,
+    "max_burst_cost_per_hr_eur": 200.0
+  },
+  "prices_eur": {
+    "burst_capacity_per_1Gbps_hr": 15.0
+  }
+}
+
