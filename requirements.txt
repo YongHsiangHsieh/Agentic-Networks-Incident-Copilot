@@ -1,11 +1,26 @@
-fastapi>=0.109.0
-uvicorn>=0.27.0
-pydantic>=2.5.0
-langgraph>=0.2.0
+# Network Incident Copilot - AI-Powered Incident Response
+# Complete dependencies for diagnosis, recommendations, and RCA generation
+
+# Core Framework
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.4.0
+
+# AI/LLM
 langchain>=0.3.0
 langchain-core>=0.3.0
-matplotlib>=3.8.0
-jinja2>=3.1.3
-pytest>=7.4.0
-httpx>=0.26.0
+langchain-aws>=0.1.6
+langgraph>=0.2.0  # Production-ready orchestration with human-in-the-loop
 
+# AWS
+boto3>=1.34.0
+
+# MCP Server (Model Context Protocol)
+mcp>=1.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+python-multipart>=0.0.6
+
+# Output formatting
+markdown>=3.5.0

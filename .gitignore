@@ -43,6 +43,14 @@ artifacts/*
 
 # Local config
 .env
+.env.local
 *.log
 
+# AWS credentials (never commit!)
+.aws/
+credentials
+
 .pytest_cache/
+# Private developer docs (not for repo)
+private_docs/
+

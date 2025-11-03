@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "network-copilot": {
+      "command": "python3",
+      "args": [
+        "/Users/wilsonhsieh/Desktop/Agentic-Networks-Incident-Copilot/mcp_server/server.py"
+      ],
+      "env": {
+        "AWS_REGION": "us-east-1",
+        "PYTHONPATH": "/Users/wilsonhsieh/Desktop/Agentic-Networks-Incident-Copilot"
+      }
+    }
+  }
+}
+

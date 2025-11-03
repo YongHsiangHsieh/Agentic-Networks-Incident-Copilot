@@ -1,0 +1,34 @@
+{
+  "incident_id": "INC-2024-1101-CONGESTION",
+  "timestamp_start": "2024-11-01T14:30:00Z",
+  "timestamp_end": "2024-11-01T15:15:00Z",
+  "hot_path": "RouterA->RouterB->RouterC",
+  
+  "metrics": {
+    "latency_ms": [35.0, 38.0, 42.0, 55.0, 78.0, 85.0, 65.0, 50.0, 40.0, 35.0],
+    "loss_pct": [0.1, 0.2, 0.5, 1.2, 2.5, 3.0, 1.8, 0.8, 0.3, 0.1],
+    "util_pct": {
+      "RouterA-RouterB": [75.0, 78.0, 82.0, 88.0, 94.0, 96.0, 90.0, 82.0, 78.0, 75.0],
+      "RouterB-RouterC": [70.0, 72.0, 76.0, 85.0, 92.0, 95.0, 88.0, 80.0, 75.0, 72.0]
+    }
+  },
+  
+  "actions_taken": [
+    "14:35 - Received PagerDuty alert for high latency",
+    "14:40 - Investigated metrics in Datadog, confirmed spike",
+    "14:45 - Checked recent deployments - none found",
+    "14:50 - Analyzed utilization, found RouterB-RouterC at 95%",
+    "14:55 - Identified congestion as root cause",
+    "15:00 - Applied QoS traffic shaping to reduce load",
+    "15:10 - Verified latency returned to baseline",
+    "15:15 - Incident resolved, monitoring continued"
+  ],
+  
+  "resolution_summary": "Applied QoS traffic shaping to reduce congestion on RouterB-RouterC segment",
+  
+  "engineer_notes": "Peak utilization of 95% on RouterB-RouterC caused packet queuing and increased latency. Traffic shaping successfully reduced load. Recommend capacity upgrade for this segment within next quarter.",
+  
+  "recent_changes": false,
+  "change_details": null
+}
+

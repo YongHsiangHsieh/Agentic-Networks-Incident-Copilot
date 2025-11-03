@@ -1,75 +1,71 @@
 """
-Pydantic data models for the Incident Playbook Picker system.
+Simplified data models for RCA Generator.
+
+Focus: Clean, minimal models for incident data and RCA generation.
 """
 
-from pydantic import BaseModel
-from typing import List, Dict, Optional, Any
+from pydantic import BaseModel, Field
+from typing import List, Dict, Optional
 
 
-class ChangeEvent(BaseModel):
-    """Represents a configuration or deployment change event."""
-    ts: str  # ISO 8601 timestamp
-    type: str  # e.g., "config_change", "deployment"
-    scope: str  # e.g., "router-A", "segment-XY"
+class IncidentMetrics(BaseModel):
+    """Time series metrics captured during an incident."""
+    latency_ms: List[float] = Field(
+        description="Latency measurements over time (milliseconds)"
+    )
+    loss_pct: List[float] = Field(
+        description="Packet loss percentages over time"
+    )
+    util_pct: Dict[str, List[float]] = Field(
+        description="Utilization per network segment over time",
+        default_factory=dict
+    )
 
 
-class Policy(BaseModel):
-    """Operational policy constraints."""
-    latency_target_ms: int
-    min_path_redundancy: int
-    max_burst_cost_per_hr_eur: float
+class IncidentData(BaseModel):
+    """Complete incident data package for RCA generation."""
+    
+    # Basic info
+    incident_id: str = Field(description="Unique incident identifier")
+    timestamp_start: str = Field(description="When incident started (ISO 8601)")
+    timestamp_end: str = Field(description="When incident was resolved (ISO 8601)")
+    
+    # Network context
+    hot_path: str = Field(
+        description="Network path affected (e.g., 'RouterA->RouterB->RouterC')"
+    )
+    
+    # Metrics
+    metrics: IncidentMetrics = Field(description="Time series metrics")
+    
+    # Actions and resolution
+    actions_taken: List[str] = Field(
+        description="Chronological list of actions taken during incident",
+        default_factory=list
+    )
+    resolution_summary: str = Field(
+        description="Brief summary of how incident was resolved"
+    )
+    
+    # Optional context
+    engineer_notes: Optional[str] = Field(
+        default=None,
+        description="Additional notes from engineer (optional)"
+    )
+    recent_changes: Optional[bool] = Field(
+        default=False,
+        description="Were there recent config/deployment changes?"
+    )
+    change_details: Optional[str] = Field(
+        default=None,
+        description="Details about recent changes if any"
+    )
 
 
-class Prices(BaseModel):
-    """Pricing information for cost calculations."""
-    burst_capacity_per_1Gbps_hr: float
-
-
-class MetricsWindow(BaseModel):
-    """Time-series metrics over an incident window."""
-    latency_ms: List[float]
-    loss_pct: List[float]
-    util_pct: Dict[str, List[float]]  # utilization per segment
-
-
-class IncidentBundle(BaseModel):
-    """Complete incident data package for analysis."""
+class RCAOutput(BaseModel):
+    """Generated RCA report output."""
     incident_id: str
-    window: Dict[str, Any]  # e.g., {"start_ts": ..., "end_ts": ...}
-    hot_path: str  # e.g., "A->B->C"
-    metrics: MetricsWindow
-    changes: List[ChangeEvent]
-    policy: Policy
-    prices_eur: Prices
-
-
-class CandidateOption(BaseModel):
-    """A potential remediation option with predictions."""
-    id: str
-    kind: str
-    eta_minutes: int
-    pred_latency_ms: float
-    pred_loss_pct: float
-    risk: str
-    euro_delta: float
-    policy_verdict: Dict[str, Any]
-    explanation: Optional[str] = None
-
-
-class IncidentState(BaseModel):
-    """State object passed through the LangGraph workflow."""
-    incident_id: str
-    bundle: IncidentBundle
-    signals: Optional[Dict[str, Any]] = None
-    change_context: Optional[Dict[str, Any]] = None
-    hypothesis: Optional[Dict[str, Any]] = None
-    candidates: Optional[List[CandidateOption]] = None
-    policy_verdicts: Optional[List[Dict[str, Any]]] = None
-    recommendation: Optional[CandidateOption] = None
-    plan: Optional[Dict[str, Any]] = None
-    artifacts: Optional[Dict[str, str]] = None
-    error: Optional[str] = None
-
-    class Config:
-        arbitrary_types_allowed = True
-
+    rca_markdown: str = Field(description="RCA report in Markdown format")
+    generation_time_sec: float = Field(description="Time taken to generate")
+    root_cause: str = Field(description="Identified root cause")
+    confidence: float = Field(description="Confidence in diagnosis (0-1)")

@@ -1,0 +1,38 @@
+{
+  "incident_id": "INC-2024-1101-HARDWARE",
+  "timestamp_start": "2024-11-01T16:20:00Z",
+  "timestamp_end": "2024-11-01T17:35:00Z",
+  "hot_path": "RouterX->RouterY->RouterZ",
+  
+  "metrics": {
+    "latency_ms": [30.0, 32.0, 31.0, 35.0, 180.0, 220.0, 195.0, 210.0, 33.0, 31.0, 30.0],
+    "loss_pct": [0.1, 0.12, 0.11, 0.15, 15.5, 18.2, 16.8, 17.5, 0.13, 0.11, 0.1],
+    "util_pct": {
+      "RouterX-RouterY": [55.0, 58.0, 56.0, 60.0, 62.0, 65.0, 63.0, 64.0, 57.0, 56.0, 55.0],
+      "RouterY-RouterZ": [52.0, 54.0, 53.0, 56.0, 58.0, 60.0, 59.0, 58.0, 54.0, 53.0, 52.0]
+    }
+  },
+  
+  "actions_taken": [
+    "16:22 - High packet loss alert received",
+    "16:25 - Investigated metrics, observed 15%+ packet loss spike",
+    "16:28 - Checked utilization, found only 65% (not congestion)",
+    "16:30 - Reviewed recent changes, none found",
+    "16:35 - SSH'd to RouterY, found CRC errors on interface eth2",
+    "16:40 - Checked hardware logs, found transceiver errors",
+    "16:45 - Identified faulty SFP+ module on RouterY eth2",
+    "16:50 - Scheduled maintenance window for replacement",
+    "17:00 - Replaced faulty SFP+ module",
+    "17:10 - Interface brought back up, no CRC errors",
+    "17:20 - Verified traffic recovery and stable metrics",
+    "17:35 - Incident closed, RMA initiated for failed module"
+  ],
+  
+  "resolution_summary": "Replaced faulty SFP+ optical transceiver on RouterY interface eth2",
+  
+  "engineer_notes": "Hardware failure of SFP+ module caused significant packet loss and retransmissions (leading to latency). CRC errors on the interface were the smoking gun. Utilization remained low throughout, ruling out congestion. The module was only 8 months old - may be a bad batch. Recommend checking other modules from same vendor/lot.",
+  
+  "recent_changes": false,
+  "change_details": null
+}
+

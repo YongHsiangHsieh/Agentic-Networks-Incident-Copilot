@@ -1,0 +1,38 @@
+{
+  "incident_id": "INC-2024-1101-ROUTING",
+  "timestamp_start": "2024-11-01T11:05:00Z",
+  "timestamp_end": "2024-11-01T11:50:00Z",
+  "hot_path": "DC1-Router1->WAN1->DC2-Router1",
+  
+  "metrics": {
+    "latency_ms": [12.0, 13.0, 12.5, 85.0, 92.0, 88.0, 90.0, 87.0, 14.0, 13.0, 12.0],
+    "loss_pct": [0.05, 0.06, 0.05, 2.8, 3.2, 2.9, 3.1, 2.7, 0.07, 0.06, 0.05],
+    "util_pct": {
+      "DC1-Router1-WAN1": [38.0, 40.0, 39.0, 42.0, 44.0, 43.0, 42.0, 41.0, 40.0, 39.0, 38.0],
+      "WAN1-DC2-Router1": [35.0, 37.0, 36.0, 40.0, 41.0, 39.0, 40.0, 38.0, 37.0, 36.0, 35.0]
+    }
+  },
+  
+  "actions_taken": [
+    "11:07 - Alert for increased latency on DC1-DC2 path",
+    "11:10 - Checked metrics, latency jumped from 12ms to 90ms",
+    "11:12 - Verified utilization at 44% (not congestion)",
+    "11:15 - Ran traceroute, found unexpected routing via transit ISP",
+    "11:18 - Checked BGP routing table, primary WAN link still up",
+    "11:20 - Discovered BGP route flapping on primary path",
+    "11:25 - Investigated further, found asymmetric routing issue",
+    "11:30 - Identified BGP peer session instability with ISP",
+    "11:35 - Contacted ISP NOC, reported BGP flapping",
+    "11:40 - ISP resolved BGP peering issue on their side",
+    "11:45 - Verified routing returned to optimal primary path",
+    "11:50 - Confirmed latency back to baseline, incident closed"
+  ],
+  
+  "resolution_summary": "ISP resolved BGP peering instability that caused traffic to route through suboptimal transit path",
+  
+  "engineer_notes": "BGP route flapping caused traffic to temporarily route through backup ISP transit link, adding 75ms of latency. Primary WAN link was technically 'up' but BGP session was unstable. ISP found configuration drift on their BGP router. This highlights need for better BGP session monitoring and alerting on route changes, not just link status.",
+  
+  "recent_changes": false,
+  "change_details": null
+}
+

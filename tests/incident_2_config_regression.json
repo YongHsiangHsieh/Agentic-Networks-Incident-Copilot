@@ -1,0 +1,35 @@
+{
+  "incident_id": "INC-2024-1101-CONFIG",
+  "timestamp_start": "2024-11-01T09:15:00Z",
+  "timestamp_end": "2024-11-01T09:45:00Z",
+  "hot_path": "CoreSwitch1->CoreSwitch2->EdgeRouter5",
+  
+  "metrics": {
+    "latency_ms": [25.0, 28.0, 26.0, 125.0, 130.0, 128.0, 132.0, 28.0, 26.0, 25.0],
+    "loss_pct": [0.05, 0.08, 0.06, 8.5, 9.2, 8.8, 9.0, 0.08, 0.06, 0.05],
+    "util_pct": {
+      "CoreSwitch1-CoreSwitch2": [45.0, 48.0, 46.0, 52.0, 50.0, 51.0, 49.0, 47.0, 46.0, 45.0],
+      "CoreSwitch2-EdgeRouter5": [42.0, 44.0, 43.0, 48.0, 47.0, 46.0, 47.0, 44.0, 43.0, 42.0]
+    }
+  },
+  
+  "actions_taken": [
+    "09:17 - Alert triggered for sudden latency spike on CoreSwitch2",
+    "09:20 - Checked dashboards, confirmed 400% latency increase",
+    "09:22 - Checked deployment timeline, found BGP config change at 09:14",
+    "09:25 - Reviewed BGP config diff, identified incorrect route metric",
+    "09:28 - Correlated timing: change at 09:14, symptoms at 09:15",
+    "09:30 - Initiated config rollback on CoreSwitch2",
+    "09:35 - Rollback completed, monitoring metrics",
+    "09:42 - Confirmed latency and loss returned to baseline",
+    "09:45 - Incident closed, post-mortem scheduled"
+  ],
+  
+  "resolution_summary": "Rolled back BGP configuration change that introduced suboptimal routing metrics",
+  
+  "engineer_notes": "BGP config change deployed at 09:14 caused traffic to route through congested path. Rollback immediately fixed the issue. The change was part of a capacity optimization effort but the route metrics were incorrectly configured. Need better pre-deployment validation for routing changes.",
+  
+  "recent_changes": true,
+  "change_details": "BGP route metric adjustment deployed to CoreSwitch2 at 09:14 UTC. Change intended to optimize traffic distribution but introduced incorrect metrics causing suboptimal routing."
+}
+
