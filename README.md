@@ -1,11 +1,12 @@
-# 🚀 Network Incident Copilot
+# 🚀 Netiply — Network Incident Copilot
 
-**AI-Powered Copilot for Network Incident Response (Production-focused, Human-in-the-loop)**
+**Netiply: AI-Powered Copilot for Network Incident Response (Production-focused, Human-in-the-loop)**
 
 Transform incident response from hours to minutes with AI-guided diagnosis, hybrid recommendations, safe command generation, and instant RCA docs — while engineers stay in control.
 
 [![AWS Bedrock](https://img.shields.io/badge/AWS-Bedrock-orange)](https://aws.amazon.com/bedrock/)
 [![LangGraph](https://img.shields.io/badge/LangGraph-1.0-blue)](https://langchain.com)
+[![LangChain](https://img.shields.io/badge/LangChain-1.0-lightgrey)](https://python.langchain.com)
 [![MCP](https://img.shields.io/badge/MCP-Server-green)](https://modelcontextprotocol.io/)
 [![Python](https://img.shields.io/badge/Python-3.10+-blue)](https://python.org)
 
@@ -15,7 +16,7 @@ Transform incident response from hours to minutes with AI-guided diagnosis, hybr
 
 Incidents aren’t just technical — they’re socio-technical. Most tools optimize for metrics collection or automation, but leave engineers doing time-consuming analysis, decision-making, and documentation under pressure. Full autonomy is risky in production networks: safety, change windows, compliance, and accountability demand human judgment.
 
-This copilot embraces that reality. It accelerates the parts that are slow and error-prone (reasoning, option ranking, command preparation, RCA writing) while keeping humans decisively in the loop. The result: consistently safer, faster outcomes without ceding control.
+Netiply embraces that reality. It accelerates the parts that are slow and error-prone (reasoning, option ranking, command preparation, RCA writing) while keeping humans decisively in the loop. The result: consistently safer, faster outcomes without ceding control.
 
 Core beliefs:
 
