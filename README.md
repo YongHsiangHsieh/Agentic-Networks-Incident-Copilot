@@ -85,6 +85,8 @@ Trade-offs chosen now for production readiness:
 - MCP Server (Model Context Protocol): Exposes our capabilities as tools to Claude Desktop, enabling natural-language control of the entire workflow (start, approve, status, history, select playbooks). This reduces friction for engineers during incidents.
 - FastAPI + Uvicorn: Solid, modern REST surface for systems integration, dashboards, and automation. Mirrors the MCP toolset for maximum flexibility.
 - Pydantic v2: Typed, structured inputs/outputs everywhere for reliability, validation, and clear interfaces between components.
+- AWS Bedrock AgentCore (deployment path): Planned managed deployment of Netiply in AWS, aligning runtime, security, and operations with Bedrock-native best practices (see Roadmap and Wiki).
+- Retrieval (RAG) + Databases for playbooks (at scale): Planned retrieval and re-ranking of a growing playbook library using RAG pipelines and database-backed indexes for efficient, context-aware selection (see Roadmap and Wiki).
 
 How they fit together:
 - Interfaces (REST + MCP) call into a single Orchestrator facade.
@@ -357,10 +359,12 @@ python3 test_production_enhancements.py
 
 These are near-term evolutions beyond the current prototype to make the system even more production-ready and flexible:
 
-- Deployment via AWS Bedrock Agents: Package and operate the copilot using AWS Bedrock Agents/Agent Core for managed, secure runtime in AWS environments.
+- Deployment via AWS Bedrock AgentCore: Package and operate the copilot using AWS Bedrock AgentCore for a managed, secure runtime in AWS environments.
 - Richer LangGraph branching and retries: In addition to human-in-the-loop, allow developers/engineers to branch, retry, or stop at any approval or decision point; different paths for different scenarios.
 - From push-only to assisted fetch: Today you push incident context at start. We’ll add human-permissioned data fetchers so the system can pull metrics/logs/topology on demand (with explicit approvals), reducing manual data wrangling.
 - Real-time monitoring integration: Begin with AWS services (e.g., CloudWatch/Prometheus connectors). On incident, the copilot can fetch the latest telemetry automatically (with human approval), so engineers don’t have to assemble the data first.
+
+- Playbooks at scale with RAG + databases: As the playbook library grows, retrieval will use Retrieval-Augmented Generation (RAG) and database-backed indexing for efficient lookup and re-ranking by context. This enables richer, situational selection across many playbooks while remaining explainable and safe.
 
 See the Wiki for implementation notes and integration options.
 
