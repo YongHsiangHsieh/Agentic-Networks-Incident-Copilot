@@ -18,10 +18,20 @@ Incidents aren’t just technical — they’re socio-technical. Most tools opti
 This copilot embraces that reality. It accelerates the parts that are slow and error-prone (reasoning, option ranking, command preparation, RCA writing) while keeping humans decisively in the loop. The result: consistently safer, faster outcomes without ceding control.
 
 Core beliefs:
+
 - Humans own risk; AI accelerates work. Approvals are mandatory at critical gates.
 - Explainability beats magic. Every recommendation comes with reasoning, risk, impact, and alternatives.
 - Durable state > stateless chat. Incidents are workflows with memory, not one-off prompts.
 - Production first. Failure modes, fallbacks, and audit trails are design requirements, not afterthoughts.
+
+---
+
+## 📖 Read the Full Wiki
+
+This README is a high-signal overview. The complete, extended documentation lives in the project Wiki and is the ultimate entry point for learning, architecture, setup, and deep dives:
+
+- Start here: `wiki/Home.md` (locally) or the GitHub Wiki tab on the repository
+- Highlights: Architecture, LangGraph workflow, Agents, Playbooks, API, MCP setup, Data integration, Testing, Production guidance
 
 ---
 
@@ -42,6 +52,7 @@ Success looks like: faster mean time to restore, safer actions with explicit app
 This system is an "agentifiable copilot" — not a fully autonomous agent. Engineers remain the pilot. The copilot accelerates analysis, suggests safe actions, and produces documentation, but key decisions (diagnosis acceptance, command approval) require human approval.
 
 Non-goals:
+
 - Replacing human judgment in risky changes
 - Blind auto-remediation without approvals
 - Becoming your monitoring stack (it complements, not replaces)
@@ -58,9 +69,33 @@ Non-goals:
 - Auditability: Every decision and approval is written to history.
 
 Trade-offs chosen now for production readiness:
+
 - Push-only data ingestion (simple, reliable) over auto-pull (complex, vendor-specific)
 - Simulated execution (safe) over device pushes (powerful but higher blast radius)
 - In-memory state (fast) over persistent DB (to be added as adoption grows)
+
+---
+
+## 🧠 Tech Stack (What we use and why)
+
+- LangGraph (stateful orchestration): Incidents are workflows, not chats. LangGraph gives durable state, checkpoints, human-in-the-loop interrupts, and conditional routing. That enables approvals, retries, branching, and audit trail by design.
+- LangChain AWS (Bedrock integration): We use LangChain’s AWS integration to access Claude on Bedrock with IAM—no API keys. This provides reliable, enterprise-grade LLM access with structured outputs (Pydantic) and easy model swaps (Haiku → Sonnet).
+- AWS Bedrock (Claude models): Claude is strong at analytical reasoning. We default to Haiku for speed/cost and can upgrade to Sonnet for harder tasks. Bedrock also aligns with enterprise security and deployment.
+- MCP Server (Model Context Protocol): Exposes our capabilities as tools to Claude Desktop, enabling natural-language control of the entire workflow (start, approve, status, history, select playbooks). This reduces friction for engineers during incidents.
+- FastAPI + Uvicorn: Solid, modern REST surface for systems integration, dashboards, and automation. Mirrors the MCP toolset for maximum flexibility.
+- Pydantic v2: Typed, structured inputs/outputs everywhere for reliability, validation, and clear interfaces between components.
+
+How they fit together:
+- Interfaces (REST + MCP) call into a single Orchestrator facade.
+- Orchestrator coordinates agents (Diagnosis → Recommendations → Commands → RCA) through LangGraph nodes with approval gates.
+- Bedrock via LangChain AWS powers reasoning; rules provide graceful fallbacks.
+
+### Tech decisions at a glance
+- LangGraph over ad‑hoc orchestration: approval gates, resumability, conditional routing, and an audit trail are first‑class needs in incident workflows.
+- Bedrock (Claude) via LangChain AWS: IAM‑secured access, easy model choice (Haiku/Sonnet), strong reasoning; fallbacks ensure reliability when AI is unavailable.
+- MCP alongside REST: natural‑language control in Claude Desktop during an incident, plus programmable APIs for automation and UIs.
+
+See the Wiki for deeper dives and examples: Architecture, LangGraph Workflow, MCP Tools, and Tech Stack pages.
 
 ---
 
@@ -87,7 +122,8 @@ Trade-offs chosen now for production readiness:
 
 Context: Peak traffic. Alerts show latency spike and 2% loss on `RouterB-RouterC`.
 
-1) Start workflow (push known context):
+1. Start workflow (push known context):
+
 ```bash
 curl -X POST http://localhost:8000/api/workflows/start \
   -H "Content-Type: application/json" \
@@ -99,9 +135,11 @@ curl -X POST http://localhost:8000/api/workflows/start \
     "priority": "high"
   }'
 ```
+
 The orchestrator stores this as `incident_data` and runs diagnosis.
 
-2) Review and approve diagnosis:
+2. Review and approve diagnosis:
+
 ```bash
 curl -X GET http://localhost:8000/api/workflows/INC-2451/status
 curl -X POST http://localhost:8000/api/workflows/INC-2451/approve-diagnosis \
@@ -109,25 +147,29 @@ curl -X POST http://localhost:8000/api/workflows/INC-2451/approve-diagnosis \
   -d '{"approved": true, "feedback": "Consistent with telemetry"}'
 ```
 
-3) Get recommendations and generate commands:
+3. Get recommendations and generate commands:
+
 - The system ranks playbooks (e.g., QoS traffic shaping, partial offload) with reasoning and risk.
 - Commands are generated from playbook templates using `incident_data` (e.g., `hot_path`).
 
-4) (Optional) choose a different playbook:
+4. (Optional) choose a different playbook:
+
 ```bash
 curl -X POST http://localhost:8000/api/workflows/INC-2451/select-playbook \
   -H "Content-Type: application/json" \
   -d '{"playbook_id": "qos_traffic_shaping"}'
 ```
 
-5) Approve commands:
+5. Approve commands:
+
 ```bash
 curl -X POST http://localhost:8000/api/workflows/INC-2451/approve-commands \
   -H "Content-Type: application/json" \
   -d '{"approved": true, "feedback": "Proceed in maintenance window"}'
 ```
 
-6) Generate RCA (automatic at the end of the workflow):
+6. Generate RCA (automatic at the end of the workflow):
+
 - The system compiles an RCA with timeline, decisions, commands, and outcomes for stakeholders.
 
 At every step, approvals and outputs are appended to `history` for audit.
@@ -145,12 +187,15 @@ At every step, approvals and outputs are appended to `history` for audit.
 ## ⚙️ Quick Start
 
 ### 1) Install
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 2) Configure AWS (for Bedrock, optional but recommended)
+
 Create `.env` or export env vars:
+
 ```bash
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your_key
@@ -159,12 +204,14 @@ BEDROCK_MODEL=us.anthropic.claude-3-5-sonnet-20241022-v2:0
 ```
 
 ### 3) Run API
+
 ```bash
 python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 # Open http://localhost:8000/docs
 ```
 
 ### 4) Minimal Workflow
+
 ```bash
 # Start
 curl -X POST http://localhost:8000/api/workflows/start \
@@ -197,7 +244,34 @@ curl -X POST http://localhost:8000/api/workflows/INC-001/approve-commands \
 
 ## 💬 Using Claude Desktop (MCP)
 
-- Start the local MCP server (provided in `mcp_server/`) and add it to Claude Desktop config.
+We provide **two MCP servers** for different use cases:
+
+1. **Direct MCP Server** (`mcp_server/server.py`)
+
+   - Quick Q&A, stateless
+   - Config: `claude_desktop_config.json`
+   - Tools: diagnose, recommend, commands, rca
+
+2. **LangGraph MCP Server** (`mcp_server/langgraph_server.py`)
+   - Production workflows with approval gates
+   - Config: `claude_desktop_config_langgraph.json`
+   - Tools: start_workflow, approve_diagnosis, approve_commands, status, history
+
+**Setup instructions:** See `private_docs/CLAUDE_DESKTOP_SETUP.md` for detailed configuration guide.
+
+**Quick setup:**
+
+```bash
+# Copy the config you want to use
+cp claude_desktop_config.json ~/Library/Application\ Support/Claude/claude_desktop_config.json
+
+# Or use the LangGraph version
+cp claude_desktop_config_langgraph.json ~/Library/Application\ Support/Claude/claude_desktop_config.json
+
+# Update the paths in the config file to match your system
+# Then restart Claude Desktop
+```
+
 - In a chat, run tools like:
   - `start_incident_workflow(incident_id, hot_path, latency_current, loss_current, priority)`
   - `approve_diagnosis(incident_id, approved, feedback)`
@@ -275,6 +349,19 @@ python3 test_production_enhancements.py
 - Pluggable persistent checkpointer (Redis/Postgres)
 - Optional command execution adapters with stronger safety gates
 - Slack bot and simple web UI
+
+---
+
+## 🔭 Future Improvements (Planned)
+
+These are near-term evolutions beyond the current prototype to make the system even more production-ready and flexible:
+
+- Deployment via AWS Bedrock Agents: Package and operate the copilot using AWS Bedrock Agents/Agent Core for managed, secure runtime in AWS environments.
+- Richer LangGraph branching and retries: In addition to human-in-the-loop, allow developers/engineers to branch, retry, or stop at any approval or decision point; different paths for different scenarios.
+- From push-only to assisted fetch: Today you push incident context at start. We’ll add human-permissioned data fetchers so the system can pull metrics/logs/topology on demand (with explicit approvals), reducing manual data wrangling.
+- Real-time monitoring integration: Begin with AWS services (e.g., CloudWatch/Prometheus connectors). On incident, the copilot can fetch the latest telemetry automatically (with human approval), so engineers don’t have to assemble the data first.
+
+See the Wiki for implementation notes and integration options.
 
 ---
 
